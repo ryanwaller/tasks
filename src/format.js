@@ -51,8 +51,13 @@ export function formatDigestDate(now = new Date()) {
 }
 
 function formatItemLine(item, now = new Date()) {
+  const statusSuffix = item.source === "notion" && item.status
+    ? ` (${item.status.toLowerCase()})`
+    : "";
   const label = dueLabel(item.dueDate, now);
-  return label ? `• ${item.title} — ${label}` : `• ${item.title}`;
+  return label
+    ? `• ${item.title}${statusSuffix} — ${label}`
+    : `• ${item.title}${statusSuffix}`;
 }
 
 export function buildDigestPayload(items, now = new Date()) {
@@ -64,9 +69,12 @@ export function buildDigestPayload(items, now = new Date()) {
   const lines = ordered.map((item) => formatItemLine(item, now));
   const text = lines.join("\n");
   const htmlLines = ordered.map((item) => {
+    const statusSuffix = item.source === "notion" && item.status
+      ? ` <span style="color:#666;">(${escapeHtml(item.status.toLowerCase())})</span>`
+      : "";
     const label = dueLabel(item.dueDate, now);
     const suffix = label ? ` <span style="color:#666;">&mdash; ${escapeHtml(label)}</span>` : "";
-    return `<li>${escapeHtml(item.title)}${suffix}</li>`;
+    return `<li>${escapeHtml(item.title)}${statusSuffix}${suffix}</li>`;
   });
   const html = `<ul style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;">${htmlLines.join("")}</ul>`;
 

@@ -32,3 +32,25 @@ test("sortDigestItems floats overdue items to the top, then keeps pin order", ()
 test("buildDigestPayload returns null for empty digests", () => {
   assert.equal(buildDigestPayload([], new Date("2026-05-01T12:00:00-04:00")), null);
 });
+
+test("buildDigestPayload adds status labels for notion items only", () => {
+  const now = new Date("2026-05-01T12:00:00-04:00");
+  const digest = buildDigestPayload([
+    {
+      source: "notion",
+      title: "Team task",
+      status: "Basically done",
+      dueDate: null,
+      pinIndex: 0
+    },
+    {
+      source: "personal",
+      title: "Personal task",
+      dueDate: null,
+      pinIndex: 1
+    }
+  ], now);
+
+  assert.match(digest.text, /Team task \(basically done\)/);
+  assert.doesNotMatch(digest.text, /Personal task \(/);
+});

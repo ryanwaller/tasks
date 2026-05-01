@@ -124,6 +124,7 @@ function decodePinnedPage(page, pinKey) {
       id: page.id,
       source: "notion",
       title,
+      status,
       isDone: status === "Done",
       dueDate: parseNotionDate(page.properties?.["Date(s)"]?.date?.start),
       url: page.url
