@@ -1,0 +1,65 @@
+name: Morning Digest
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Where to send the digest"
+        required: true
+        default: both
+        type: choice
+        options:
+          - both
+          - email
+          - slack
+      dry_run:
+        description: "Build the digest without sending"
+        required: true
+        default: true
+        type: boolean
+  schedule:
+    - cron: "0 8 * * *"
+      timezone: "America/New_York"
+    - cron: "30 9 * * 1-5"
+      timezone: "America/New_York"
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Select target
+        id: target
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run_target=${{ inputs.target }}" >> "$GITHUB_OUTPUT"
+            echo "dry_run=${{ inputs.dry_run }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "0 8 * * *" ]; then
+            echo "run_target=email" >> "$GITHUB_OUTPUT"
+            echo "dry_run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_target=slack" >> "$GITHUB_OUTPUT"
+            echo "dry_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run digest
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_PERSONAL_TASKS_DATA_SOURCE_ID: ${{ secrets.NOTION_PERSONAL_TASKS_DATA_SOURCE_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_FROM_EMAIL: ${{ secrets.DIGEST_FROM_EMAIL }}
+          DIGEST_TO_EMAIL: ${{ secrets.DIGEST_TO_EMAIL }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+          RUN_TARGET: ${{ steps.target.outputs.run_target }}
+          DRY_RUN: ${{ steps.target.outputs.dry_run }}
+        run: node src/run-digest.js

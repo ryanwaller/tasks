@@ -1,0 +1,14 @@
+{
+  "name": "tasks-morning-digest",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Morning pinned-task digest for email and Slack.",
+  "scripts": {
+    "digest": "node src/run-digest.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
