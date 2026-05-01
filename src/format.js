@@ -62,16 +62,13 @@ export function buildDigestPayload(items, now = new Date()) {
   const dateLabel = formatDigestDate(now);
   const subject = `Next up for ${dateLabel}`;
   const lines = ordered.map((item) => formatItemLine(item, now));
-  const text = [subject, "", ...lines].join("\n");
+  const text = lines.join("\n");
   const htmlLines = ordered.map((item) => {
     const label = dueLabel(item.dueDate, now);
     const suffix = label ? ` <span style="color:#666;">&mdash; ${escapeHtml(label)}</span>` : "";
     return `<li>${escapeHtml(item.title)}${suffix}</li>`;
   });
-  const html = [
-    `<h2 style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">${escapeHtml(subject)}</h2>`,
-    `<ul style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;">${htmlLines.join("")}</ul>`
-  ].join("");
+  const html = `<ul style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;">${htmlLines.join("")}</ul>`;
 
   return { subject, text, html, ordered };
 }
