@@ -20,7 +20,7 @@ on:
   schedule:
     - cron: "0 8 * * *"
       timezone: "America/New_York"
-    - cron: "30 9 * * 1-5"
+    - cron: "31 9 * * 1-5"
       timezone: "America/New_York"
 
 jobs:
