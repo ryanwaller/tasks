@@ -11,14 +11,13 @@ export function dayDiff(from, to) {
 export function dueLabel(date, now = new Date()) {
   if (!date) return null;
   const days = dayDiff(now, date);
-  if (days < 0) return `overdue ${Math.abs(days)}d`;
-  if (days === 0) return "today";
-  if (days === 1) return "tomorrow";
-  if (days <= 6) return `in ${days}d`;
-  return date.toLocaleDateString("en-US", {
+  if (days < 0) return `overdue (by ${Math.abs(days)}d)`;
+  if (days === 0) return "due today";
+  if (days === 1) return "due tomorrow";
+  return `due ${date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric"
-  });
+  })}`;
 }
 
 export function isOverdue(date, now = new Date()) {

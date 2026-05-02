@@ -5,10 +5,10 @@ import { buildDigestPayload, dueLabel, sortDigestItems } from "../src/format.js"
 
 test("dueLabel formats relative dates like the app", () => {
   const now = new Date("2026-05-01T12:00:00-04:00");
-  assert.equal(dueLabel(new Date("2026-04-29T12:00:00-04:00"), now), "overdue 2d");
-  assert.equal(dueLabel(new Date("2026-05-01T12:00:00-04:00"), now), "today");
-  assert.equal(dueLabel(new Date("2026-05-02T12:00:00-04:00"), now), "tomorrow");
-  assert.equal(dueLabel(new Date("2026-05-05T12:00:00-04:00"), now), "in 4d");
+  assert.equal(dueLabel(new Date("2026-04-29T12:00:00-04:00"), now), "overdue (by 2d)");
+  assert.equal(dueLabel(new Date("2026-05-01T12:00:00-04:00"), now), "due today");
+  assert.equal(dueLabel(new Date("2026-05-02T12:00:00-04:00"), now), "due tomorrow");
+  assert.equal(dueLabel(new Date("2026-05-05T12:00:00-04:00"), now), "due May 5");
 });
 
 test("sortDigestItems floats overdue items to the top, then keeps pin order", () => {
@@ -53,4 +53,26 @@ test("buildDigestPayload adds status labels for notion items only", () => {
 
   assert.match(digest.text, /Team task \(basically done\)/);
   assert.doesNotMatch(digest.text, /Personal task \(/);
+});
+
+test("buildDigestPayload appends due labels after notion status", () => {
+  const now = new Date("2026-05-01T12:00:00-04:00");
+  const digest = buildDigestPayload([
+    {
+      source: "notion",
+      title: "Team task",
+      status: "In progress",
+      dueDate: new Date("2026-04-27T12:00:00-04:00"),
+      pinIndex: 0
+    },
+    {
+      source: "personal",
+      title: "Personal task",
+      dueDate: new Date("2026-05-03T12:00:00-04:00"),
+      pinIndex: 1
+    }
+  ], now);
+
+  assert.match(digest.text, /Team task \(in progress\) — overdue \(by 4d\)/);
+  assert.match(digest.text, /Personal task — due May 3/);
 });
