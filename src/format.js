@@ -64,7 +64,7 @@ export function buildDigestPayload(items, now = new Date()) {
   if (ordered.length === 0) return null;
 
   const dateLabel = formatDigestDate(now);
-  const subject = `Next up for ${dateLabel}`;
+  const subject = `Next up for Ryan, today, ${dateLabel}`;
   const lines = ordered.map((item) => formatItemLine(item, now));
   const text = lines.join("\n");
   const htmlLines = ordered.map((item) => {

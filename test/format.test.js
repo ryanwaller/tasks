@@ -33,6 +33,20 @@ test("buildDigestPayload returns null for empty digests", () => {
   assert.equal(buildDigestPayload([], new Date("2026-05-01T12:00:00-04:00")), null);
 });
 
+test("buildDigestPayload personalizes the subject line", () => {
+  const now = new Date("2026-05-04T12:00:00-04:00");
+  const digest = buildDigestPayload([
+    {
+      source: "personal",
+      title: "Personal task",
+      dueDate: null,
+      pinIndex: 0
+    }
+  ], now);
+
+  assert.equal(digest.subject, "Next up for Ryan, today, Monday, May 4");
+});
+
 test("buildDigestPayload adds status labels for notion items only", () => {
   const now = new Date("2026-05-01T12:00:00-04:00");
   const digest = buildDigestPayload([
